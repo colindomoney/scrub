@@ -1,0 +1,28 @@
+{
+  "name": "scrub-clipboard",
+  "title": "Scrub Clipboard",
+  "description": "Sanitise clipboard contents before pasting into AI tools",
+  "icon": "icon.png",
+  "author": "colin-tou",
+  "categories": ["Security"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "scrub-clipboard",
+      "title": "Scrub Clipboard",
+      "description": "Strip secrets and tokens from clipboard",
+      "mode": "no-view"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.93.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint"
+  }
+}
