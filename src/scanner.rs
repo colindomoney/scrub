@@ -42,6 +42,14 @@ pub fn scan_lines(text: &str, config: &ResolvedConfig) -> Vec<Match> {
         for (label, lazy_re) in named_patterns() {
             let re = &**lazy_re;
             for m in re.find_iter(line) {
+                // Filter out false-positive "Base64 Blob" matches that are
+                // actually file paths: paths contain '/' but never '+' or '='.
+                if *label == "Base64 Blob 40+" {
+                    let matched = &line[m.start()..m.end()];
+                    if matched.contains('/') && !matched.contains('+') && !matched.contains('=') {
+                        continue;
+                    }
+                }
                 line_matches.push(Match {
                     line_no,
                     byte_start: m.start(),
@@ -74,15 +82,21 @@ pub fn scan_lines(text: &str, config: &ResolvedConfig) -> Vec<Match> {
                 let already = line_matches.iter().any(|m| {
                     m.line_no == line_no && m.byte_start < be && bs < m.byte_end
                 });
-                if !already {
-                    line_matches.push(Match {
-                        line_no,
-                        byte_start: bs,
-                        byte_end: be,
-                        kind: MatchKind::HighEntropyToken,
-                        entropy: Some(e),
-                    });
+                if already {
+                    continue;
                 }
+                // Skip path-like tokens: contain '/' but no '+' or '='
+                let token = &line[bs..be];
+                if token.contains('/') && !token.contains('+') && !token.contains('=') {
+                    continue;
+                }
+                line_matches.push(Match {
+                    line_no,
+                    byte_start: bs,
+                    byte_end: be,
+                    kind: MatchKind::HighEntropyToken,
+                    entropy: Some(e),
+                });
             }
         }
 
@@ -137,5 +151,16 @@ mod tests {
         assert!(matches
             .iter()
             .all(|m| !matches!(m.kind, MatchKind::HighEntropyToken)));
+    }
+
+    #[test]
+    fn file_path_not_matched_as_base64() {
+        let text = "path: /Users/johndoe/Documents/Projects/myapp/src/main.rs";
+        let matches = scan_lines(text, &config(Sensitivity::Medium));
+        assert!(
+            matches.is_empty(),
+            "expected no matches for file path, got: {:?}",
+            matches
+        );
     }
 }
