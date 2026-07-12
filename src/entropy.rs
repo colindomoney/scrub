@@ -53,7 +53,7 @@ pub fn high_entropy_tokens(
                 let stripped = raw_token.trim_matches(|c| matches!(c, '\'' | '"' | '`' | ':' | '='));
                 if stripped.len() >= min_len {
                     let e = shannon_entropy(stripped);
-                    if e >= threshold {
+                    if e > threshold {
                         // Locate stripped token within the original line segment
                         // to get correct byte offsets.
                         if let Some(offset) = line[seg_start..i].find(stripped) {

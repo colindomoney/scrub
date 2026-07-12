@@ -1,5 +1,5 @@
-import { Clipboard, showHUD, pasteText } from "@raycast/api";
-import { execSync } from "child_process";
+import { Clipboard, showHUD } from "@raycast/api";
+import { execFileSync } from "child_process";
 import { existsSync } from "fs";
 import { homedir } from "os";
 
@@ -25,15 +25,18 @@ export default async function Command() {
   try {
     scrubBin = findScrub();
   } catch {
-    await showHUD("⚠ scrub not installed — run: cargo install --path .");
+    await showHUD(
+      "⚠ scrub not installed — run: cargo install --path <scrub-repo>",
+    );
     return;
   }
 
   let scrubbed: string;
   try {
-    scrubbed = execSync(`${scrubBin} --sensitivity high`, {
+    scrubbed = execFileSync(scrubBin, ["--sensitivity", "high"], {
       input: text,
       encoding: "utf8",
+      maxBuffer: 10 * 1024 * 1024,
     });
   } catch {
     await showHUD("⚠ scrub failed");
@@ -41,12 +44,12 @@ export default async function Command() {
   }
 
   await Clipboard.copy(scrubbed);
-  await pasteText(scrubbed);
+  await Clipboard.paste(scrubbed);
 
   const count = (scrubbed.match(/\[X+\]/g) || []).length;
   await showHUD(
     count > 0
       ? `✓ ${count} secret${count > 1 ? "s" : ""} redacted`
-      : `✓ Nothing to redact`
+      : `✓ Nothing to redact`,
   );
 }

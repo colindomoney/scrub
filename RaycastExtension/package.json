@@ -1,10 +1,16 @@
 {
   "name": "scrub-clipboard",
+  "version": "0.2.0",
   "title": "Scrub Clipboard",
   "description": "Sanitise clipboard contents before pasting into AI tools",
   "icon": "icon.png",
-  "author": "colin-tou",
-  "categories": ["Security"],
+  "author": "colind",
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Security"
+  ],
   "license": "MIT",
   "commands": [
     {
@@ -18,11 +24,13 @@
     "@raycast/api": "^1.93.0"
   },
   "devDependencies": {
+    "@raycast/eslint-config": "^2.2.0",
+    "prettier": "^3.9.5",
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "build": "ray build -e dist",
-    "dev": "ray develop",
-    "lint": "ray lint"
+    "build": "npx ray build -e dist",
+    "dev": "npx ray develop",
+    "lint": "npx ray lint"
   }
 }

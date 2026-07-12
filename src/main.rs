@@ -41,7 +41,8 @@ fn main() {
     };
 
     // Read input
-    let text = match &cli.input_file {
+    let input_path = cli.input.as_ref().or(cli.input_file.as_ref());
+    let text = match input_path {
         Some(path) => match std::fs::read_to_string(path) {
             Ok(t) => t,
             Err(e) => {

@@ -8,8 +8,12 @@ pub struct Cli {
     pub input_file: Option<PathBuf>,
 
     /// Detection sensitivity
-    #[arg(short = 's', long, default_value = "medium")]
-    pub sensitivity: Sensitivity,
+    #[arg(short = 's', long)]
+    pub sensitivity: Option<Sensitivity>,
+
+    /// Input file (alternative to the positional argument)
+    #[arg(long, value_name = "FILE", conflicts_with = "input_file")]
+    pub input: Option<PathBuf>,
 
     /// Write output to file instead of stdout
     #[arg(short = 'o', long)]

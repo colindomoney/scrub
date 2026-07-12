@@ -20,18 +20,20 @@ pub struct ResolvedConfig {
 
 impl ResolvedConfig {
     pub fn from(cli: &Cli, file: FileConfig) -> Result<Self, String> {
-        // CLI sensitivity takes priority over file config
-        let sensitivity = if cli.sensitivity != Sensitivity::Medium {
-            cli.sensitivity.clone()
+        // An explicitly supplied CLI value takes priority over the config file.
+        // Keeping this as an Option lets `--sensitivity medium` override a
+        // config file that specifies `high`.
+        let sensitivity = if let Some(sensitivity) = &cli.sensitivity {
+            sensitivity.clone()
         } else if let Some(ref s) = file.sensitivity {
-            match s.as_str() {
+            match s.to_ascii_lowercase().as_str() {
                 "low" => Sensitivity::Low,
                 "medium" => Sensitivity::Medium,
                 "high" => Sensitivity::High,
                 other => return Err(format!("invalid sensitivity in config: {other}")),
             }
         } else {
-            cli.sensitivity.clone()
+            Sensitivity::Medium
         };
 
         let (entropy_threshold, min_token_length) = match sensitivity {
