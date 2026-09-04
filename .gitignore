@@ -1,3 +1,5 @@
 /target
 .claude/
 .Codex/settings.local.json
+.DS_Store
+.claude/settings.local.json
