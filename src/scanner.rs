@@ -41,7 +41,20 @@ pub fn scan_lines(text: &str, config: &ResolvedConfig) -> Vec<Match> {
         // Named patterns
         for (label, lazy_re) in named_patterns() {
             let re = &**lazy_re;
-            for m in re.find_iter(line) {
+            for caps in re.captures_iter(line) {
+                // Patterns with capture groups redact only the first group that
+                // participated (e.g. the value, not the key name).
+                let m = caps
+                    .iter()
+                    .skip(1)
+                    .flatten()
+                    .next()
+                    .unwrap_or_else(|| caps.get(0).unwrap());
+                // URLs under secret-named keys (`token_url`, `secret_endpoint`)
+                // are config, not secrets.
+                if *label == "Secret-named key" && m.as_str().contains("://") {
+                    continue;
+                }
                 // Filter out false-positive "Base64 Blob" matches that are
                 // actually file paths: paths contain '/' but never '+' or '='.
                 if *label == "Base64 Blob 40+" {
@@ -151,6 +164,57 @@ mod tests {
         assert!(matches
             .iter()
             .all(|m| !matches!(m.kind, MatchKind::HighEntropyToken)));
+    }
+
+    fn redacted_spans<'a>(text: &'a str, sensitivity: Sensitivity) -> Vec<&'a str> {
+        let line = text.lines().next().unwrap();
+        scan_lines(text, &config(sensitivity))
+            .iter()
+            .map(|m| &line[m.byte_start..m.byte_end])
+            .collect()
+    }
+
+    #[test]
+    fn secret_named_key_redacts_uuid_value_in_json() {
+        let text = r#"  "RAINDROP_ACCESS_TOKEN": "216b2227-25e0-4838-83e1-6a4032ca37a9","#;
+        assert_eq!(
+            redacted_spans(text, Sensitivity::Low),
+            vec!["216b2227-25e0-4838-83e1-6a4032ca37a9"]
+        );
+    }
+
+    #[test]
+    fn secret_named_key_redacts_short_low_entropy_password() {
+        let text = r#""CRONOMETER_PASSWORD": "Summer2024abc!""#;
+        assert_eq!(redacted_spans(text, Sensitivity::Low), vec!["Summer2024abc!"]);
+    }
+
+    #[test]
+    fn secret_named_key_handles_env_yaml_and_single_quotes() {
+        assert_eq!(
+            redacted_spans("DB_PASSWORD=hunter2hunter2", Sensitivity::Low),
+            vec!["hunter2hunter2"]
+        );
+        assert_eq!(
+            redacted_spans("client_secret: 'abc def ghi jkl'", Sensitivity::Low),
+            vec!["abc def ghi jkl"]
+        );
+        assert_eq!(
+            redacted_spans("{apiKey: abcdefgh1234}", Sensitivity::Low),
+            vec!["abcdefgh1234"]
+        );
+    }
+
+    #[test]
+    fn secret_named_key_ignores_urls_short_values_and_other_keys() {
+        for text in [
+            r#""token_url": "https://auth.example.com/oauth/token""#,
+            r#""max_tokens": 4096"#,
+            r#""MCP_SERVER_NAME": "Trello-ToU""#,
+            r#""author": "Colin Domoney""#,
+        ] {
+            assert!(redacted_spans(text, Sensitivity::Low).is_empty(), "{text}");
+        }
     }
 
     #[test]

@@ -98,7 +98,7 @@ Detected at all sensitivity levels:
 - Bearer tokens
 - Hex strings ≥ 32 chars
 - Base64 blobs ≥ 40 chars
-- Generic `API_KEY=`, `SECRET_KEY=`, `ACCESS_TOKEN=` assignments
+- Values ≥ 8 chars assigned to any key whose name contains `token`, `secret`, `password`/`passwd`, `api_key`/`apikey` or `private_key`, in JSON, YAML, TOML or env form (`"RAINDROP_ACCESS_TOKEN": "…"`, `DB_PASSWORD=…`). Only the value is redacted; URL values are left alone.
 
 ---
 

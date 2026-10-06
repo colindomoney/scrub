@@ -1,4 +1,4 @@
-import { Clipboard, showHUD } from "@raycast/api";
+import { Clipboard, getPreferenceValues, showHUD } from "@raycast/api";
 import { execFileSync } from "child_process";
 import { existsSync } from "fs";
 import { homedir } from "os";
@@ -31,9 +31,11 @@ export default async function Command() {
     return;
   }
 
+  const { sensitivity } = getPreferenceValues<Preferences.ScrubClipboard>();
+
   let scrubbed: string;
   try {
-    scrubbed = execFileSync(scrubBin, ["--sensitivity", "high"], {
+    scrubbed = execFileSync(scrubBin, ["--sensitivity", sensitivity], {
       input: text,
       encoding: "utf8",
       maxBuffer: 10 * 1024 * 1024,

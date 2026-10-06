@@ -14,7 +14,10 @@ declare type Preferences = ExtensionPreferences
 
 declare namespace Preferences {
   /** Preferences accessible in the `scrub-clipboard` command */
-  export type ScrubClipboard = ExtensionPreferences & {}
+  export type ScrubClipboard = ExtensionPreferences & {
+  /** Sensitivity - low: named patterns only. medium: + entropy > 4.5, length >= 20. high: + entropy > 3.8, length >= 16. */
+  "sensitivity": "high" | "medium" | "low"
+}
 }
 
 declare namespace Arguments {

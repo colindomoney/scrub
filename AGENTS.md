@@ -47,7 +47,7 @@ Per `scrub-spec.md`, the main tool is a Rust binary using:
 - `medium`: named patterns + entropy > 4.5 AND length > 20
 - `high`: named patterns + entropy > 3.8 AND length > 16
 
-**Named patterns** (all levels): AWS keys, JWTs, PEM blocks, `sk-`/`sk-ant-`/`ghp_`/`ghs_`/`xox*-`/Stripe/Bearer prefixes, hex ≥ 32 chars, base64 ≥ 40 chars.
+**Named patterns** (all levels): AWS keys, JWTs, PEM blocks, `sk-`/`sk-ant-`/`ghp_`/`ghs_`/`xox*-`/Stripe/Bearer prefixes, hex ≥ 32 chars, base64 ≥ 40 chars, values of secret-named keys (`*token*`, `*secret*`, `*password*`, `*api_key*`, `*private_key*`).
 
 **Check mode** (`--check`): no stdout, exits with count of secrets found (0 = clean). Designed for git pre-commit hooks and CI.
 

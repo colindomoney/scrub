@@ -17,7 +17,31 @@
       "name": "scrub-clipboard",
       "title": "Scrub Clipboard",
       "description": "Strip secrets and tokens from clipboard",
-      "mode": "no-view"
+      "mode": "no-view",
+      "preferences": [
+        {
+          "name": "sensitivity",
+          "type": "dropdown",
+          "required": false,
+          "title": "Sensitivity",
+          "description": "low: named patterns only. medium: + entropy > 4.5, length >= 20. high: + entropy > 3.8, length >= 16.",
+          "default": "high",
+          "data": [
+            {
+              "title": "High",
+              "value": "high"
+            },
+            {
+              "title": "Medium",
+              "value": "medium"
+            },
+            {
+              "title": "Low",
+              "value": "low"
+            }
+          ]
+        }
+      ]
     }
   ],
   "dependencies": {
