@@ -15,6 +15,8 @@ npm run dev
 
 Raycast imports the extension while development mode is running. Assign a hotkey in Raycast Settings → Extensions → Scrub Clipboard.
 
+After the first import, `make install` from the repository root rebuilds both the `scrub` binary and the extension.
+
 Detection sensitivity (`low`, `medium` or `high`, default `high`) is set in the command's Raycast preferences and passed to `scrub --sensitivity`. Your scrub config file's `allowlist` and `extra_patterns` still apply.
 
 The extension looks for `scrub` in `~/.cargo/bin`, `/usr/local/bin`, and `/opt/homebrew/bin`.
