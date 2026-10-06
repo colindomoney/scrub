@@ -7,7 +7,10 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {}
+type ExtensionPreferences = {
+  /** Sensitivity - low: named patterns only. medium: + entropy > 4.5, length >= 20. high: + entropy > 3.8, length >= 16. */
+  "sensitivity": "high" | "medium" | "low"
+}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences
